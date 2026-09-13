@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tech.tzepart</title>
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="logo" href="../../index.html">tech<span>.</span>tzepart</a>
+      <nav class="main-nav">
+        <a href="../../index.html#posts">Posts</a>
+        <a href="../../index.html#topics">Topics</a>
+        <a href="../../index.html#about">About</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <main>
+    <article class="wrap post-article">
+      <div class="post-header">
+        <span class="tag" id="postTag">…</span>
+        <h1 id="postTitle">Loading…</h1>
+        <div class="meta"><span id="postDate"></span><span>·</span><span id="postReadTime"></span></div>
+      </div>
+
+      <div id="heroSlot"></div>
+
+      <div class="post-layout">
+        <aside class="toc">
+          <p class="toc-title">Table of Contents</p>
+          <ol id="tocList"></ol>
+        </aside>
+
+        <div class="post-content" id="postContent">
+          <p class="markdown-loading">Loading post…</p>
+        </div>
+      </div>
+
+      <div class="post-footer-nav">
+        <a href="../../index.html">← Back to all posts</a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; 2026 tech.tzepart — placeholder content, not a real blog yet.</p>
+      <div class="footer-links">
+        <a href="https://github.com/tzepart/tech-tzepart" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="../../assets/js/main.js"></script>
+  <script src="../../assets/js/post.js"></script>
+</body>
+</html>

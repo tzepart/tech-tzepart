@@ -20,5 +20,16 @@
     "excerpt": "Producers, brokers, and consumers — with a sequence diagram, a retry flowchart, and a broker comparison table.",
     "format": "md",
     "featured": false
+  },
+  {
+    "slug": "future-of-sw-development",
+    "title": "Future of SW development",
+    "tag": "Dev, AI",
+    "date": "2026-09-14",
+    "dateLabel": "Sep 14, 2026",
+    "readTime": "5 min",
+    "excerpt": "Several scenarios of the future of dev in AI age",
+    "format": "md",
+    "featured": false
   }
 ]
