@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deploying Static Sites with GitHub Pages — tech.tzepart</title>
+  <meta name="description" content="A walkthrough of the GitHub Actions workflow that deploys this site to GitHub Pages on every push to main." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="logo" href="../../index.html">tech<span>.</span>tzepart</a>
+      <nav class="main-nav">
+        <a href="../../index.html#posts">Posts</a>
+        <a href="../../index.html#topics">Topics</a>
+        <a href="../../index.html#about">About</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <main>
+    <article class="wrap post-article">
+      <div class="post-header">
+        <span class="tag">DevOps</span>
+        <h1>Deploying Static Sites with GitHub Pages</h1>
+        <div class="meta"><span>Sep 10, 2026</span><span>·</span><span>4 min read</span></div>
+      </div>
+
+      <figure class="post-hero">
+        <svg viewBox="0 0 760 220" role="img" aria-labelledby="hero2-title">
+          <title id="hero2-title">A cloud icon connected to a browser window</title>
+          <path d="M180 130 a40 40 0 0 1 0 -80 a55 55 0 0 1 108 -10 a45 45 0 0 1 8 90 z"
+                class="dg-box-accent" />
+          <rect x="450" y="60" width="240" height="140" rx="10" class="dg-box" />
+          <rect x="450" y="60" width="240" height="26" rx="10" class="dg-box" />
+          <circle cx="466" cy="73" r="4" class="dg-box-accent" />
+          <circle cx="480" cy="73" r="4" class="dg-box-accent" />
+          <circle cx="494" cy="73" r="4" class="dg-box-accent" />
+          <text x="570" y="145" class="dg-text">your-site.github.io</text>
+          <line x1="300" y1="110" x2="440" y2="110" class="dg-line-dash" />
+          <text x="370" y="95" class="dg-text-sm">served via CDN</text>
+        </svg>
+        <figcaption>Push to main, and GitHub takes care of the rest.</figcaption>
+      </figure>
+
+      <div class="post-layout">
+        <aside class="toc">
+          <p class="toc-title">Table of Contents</p>
+          <ol>
+            <li><a href="#why-static">Why static hosting</a></li>
+            <li><a href="#trigger">How the workflow gets triggered</a></li>
+            <li><a href="#inside-job">Inside the deploy job</a></li>
+            <li><a href="#pipeline">From push to CDN, step by step</a></li>
+            <li><a href="#caveats">Caveats and gotchas</a></li>
+            <li><a href="#checklist">A quick checklist</a></li>
+          </ol>
+        </aside>
+
+        <div class="post-content">
+          <h2 id="why-static">Why static hosting</h2>
+          <p>
+            This site has no server-side logic, so it doesn't need a server. GitHub
+            Pages hosts static files directly from a repository and fronts them
+            with a CDN, for free, with a workflow that already ships with the
+            <code>actions/deploy-pages</code> action. For a blog like this one,
+            that's the entire hosting requirement solved in a few YAML lines.
+          </p>
+
+          <h2 id="trigger">How the workflow gets triggered</h2>
+          <p>
+            The workflow in this repo triggers on two events: a push to
+            <code>main</code>, and a manual <code>workflow_dispatch</code> for
+            when I want to redeploy without a new commit (useful after changing
+            Pages settings, for example).
+          </p>
+          <pre><code>on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:</code></pre>
+
+          <h2 id="inside-job">Inside the deploy job</h2>
+          <p>
+            There's a single job with three steps: check out the repository,
+            configure Pages, and upload the checked-out files as a Pages artifact.
+            A fourth step then deploys that artifact.
+          </p>
+          <pre><code>steps:
+  - uses: actions/checkout@v4
+  - uses: actions/configure-pages@v5
+  - uses: actions/upload-pages-artifact@v3
+    with:
+      path: '.'
+  - uses: actions/deploy-pages@v5</code></pre>
+          <p>
+            Because <code>path: '.'</code> uploads the entire repository root,
+            there's no build step to configure — the HTML, CSS, and JS in this
+            repo <em>are</em> the deployed artifact.
+          </p>
+
+          <h2 id="pipeline">From push to CDN, step by step</h2>
+          <figure class="diagram">
+            <svg viewBox="0 0 780 200" role="img" aria-labelledby="diagram2-title">
+              <title id="diagram2-title">Deployment pipeline from git push to CDN</title>
+              <defs>
+                <marker id="arrow-deploy" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                  <path d="M0,0 L8,4 L0,8 Z" class="dg-text-sm" fill="currentColor" />
+                </marker>
+              </defs>
+
+              <rect x="10" y="80" width="110" height="46" rx="8" class="dg-box" />
+              <text x="65" y="103" class="dg-text-sm">git push main</text>
+
+              <line x1="120" y1="103" x2="155" y2="103" class="dg-line" marker-end="url(#arrow-deploy)" />
+
+              <rect x="160" y="80" width="110" height="46" rx="8" class="dg-box" />
+              <text x="215" y="103" class="dg-text-sm">Actions: checkout</text>
+
+              <line x1="270" y1="103" x2="305" y2="103" class="dg-line" marker-end="url(#arrow-deploy)" />
+
+              <rect x="310" y="80" width="120" height="46" rx="8" class="dg-box" />
+              <text x="370" y="103" class="dg-text-sm">configure-pages</text>
+
+              <line x1="430" y1="103" x2="465" y2="103" class="dg-line" marker-end="url(#arrow-deploy)" />
+
+              <rect x="470" y="80" width="130" height="46" rx="8" class="dg-box" />
+              <text x="535" y="103" class="dg-text-sm">upload artifact</text>
+
+              <line x1="600" y1="103" x2="635" y2="103" class="dg-line" marker-end="url(#arrow-deploy)" />
+
+              <rect x="640" y="80" width="130" height="46" rx="8" class="dg-box-accent" />
+              <text x="705" y="103" class="dg-text-sm">deploy-pages</text>
+            </svg>
+            <figcaption>Every step runs on every push — there's no incremental build to get wrong.</figcaption>
+          </figure>
+
+          <h2 id="caveats">Caveats and gotchas</h2>
+          <ul>
+            <li>Pages must be switched to "GitHub Actions" as the source in repo settings, not the legacy branch-based deploy.</li>
+            <li>Absolute root-relative paths (<code>/assets/...</code>) break on project pages served from a subpath — this site uses relative paths instead.</li>
+            <li>The <code>permissions</code> block needs <code>pages: write</code> and <code>id-token: write</code>, or the deploy step fails with a cryptic 403.</li>
+          </ul>
+
+          <h2 id="checklist">A quick checklist</h2>
+          <ol>
+            <li>Repository settings → Pages → Source → GitHub Actions.</li>
+            <li>Workflow has <code>contents: read</code>, <code>pages: write</code>, <code>id-token: write</code>.</li>
+            <li>All internal links and asset references are relative, not root-absolute.</li>
+            <li>Push to <code>main</code> and watch the Actions tab.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="post-footer-nav">
+        <a href="../../index.html">← Back to all posts</a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; 2026 tech.tzepart — placeholder content, not a real blog yet.</p>
+      <div class="footer-links">
+        <a href="https://github.com/tzepart/tech-tzepart" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

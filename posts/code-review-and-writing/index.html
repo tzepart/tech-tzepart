@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Code Review Taught Me About Writing — tech.tzepart</title>
+  <meta name="description" content="Clear code and clear prose have more in common than I expected." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="logo" href="../../index.html">tech<span>.</span>tzepart</a>
+      <nav class="main-nav">
+        <a href="../../index.html#posts">Posts</a>
+        <a href="../../index.html#topics">Topics</a>
+        <a href="../../index.html#about">About</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <main>
+    <article class="wrap post-article">
+      <div class="post-header">
+        <span class="tag">Career</span>
+        <h1>What Code Review Taught Me About Writing</h1>
+        <div class="meta"><span>Aug 14, 2026</span><span>·</span><span>3 min read</span></div>
+      </div>
+
+      <figure class="post-hero">
+        <svg viewBox="0 0 760 200" role="img" aria-labelledby="hero6-title">
+          <title id="hero6-title">A document with a pen, and a code bracket beside it</title>
+          <rect x="260" y="40" width="140" height="120" rx="8" class="dg-box" />
+          <line x1="280" y1="70" x2="380" y2="70" class="dg-line" />
+          <line x1="280" y1="90" x2="380" y2="90" class="dg-line" />
+          <line x1="280" y1="110" x2="340" y2="110" class="dg-line" />
+          <text x="440" y="105" class="dg-text" font-size="28">&lt;/&gt;</text>
+        </svg>
+        <figcaption>Two drafts, one skill: saying exactly what you mean, once.</figcaption>
+      </figure>
+
+      <div class="post-layout">
+        <aside class="toc">
+          <p class="toc-title">Table of Contents</p>
+          <ol>
+            <li><a href="#parallel">The parallel I didn't expect</a></li>
+            <li><a href="#clarity">Clarity is a courtesy, not a nicety</a></li>
+            <li><a href="#lifecycle">The PR lifecycle, mapped onto drafting</a></li>
+            <li><a href="#self-edit">Editing yourself before anyone else has to</a></li>
+            <li><a href="#takeaways">Takeaways</a></li>
+          </ol>
+        </aside>
+
+        <div class="post-content">
+          <h2 id="parallel">The parallel I didn't expect</h2>
+          <p>
+            After a few years of reviewing pull requests, I noticed the same
+            feedback showing up whether I was reviewing code or reading a draft
+            document: <em>this does two things, split it</em>, <em>I can't tell
+            why this exists</em>, <em>the name doesn't match what it does</em>.
+            Code review turned out to be writing feedback wearing a different
+            outfit.
+          </p>
+
+          <h2 id="clarity">Clarity is a courtesy, not a nicety</h2>
+          <p>
+            A PR description that explains <em>why</em> a change exists saves
+            every future reader — including the reviewer, and including you in
+            six months — from having to reconstruct the reasoning from the diff
+            alone. The same is true of a topic sentence in a paragraph. Neither
+            is decoration; both are you doing the reader's work for them once,
+            up front, instead of leaving it to be repeated by everyone who reads it after.
+          </p>
+
+          <h2 id="lifecycle">The PR lifecycle, mapped onto drafting</h2>
+          <figure class="diagram">
+            <svg viewBox="0 0 760 180" role="img" aria-labelledby="diagram6-title">
+              <title id="diagram6-title">Pull request lifecycle from open to merge</title>
+              <defs>
+                <marker id="arrow-pr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                  <path d="M0,0 L8,4 L0,8 Z" class="dg-text-sm" fill="currentColor" />
+                </marker>
+              </defs>
+              <rect x="10" y="65" width="140" height="50" rx="8" class="dg-box" />
+              <text x="80" y="90" class="dg-text-sm">open draft / PR</text>
+              <line x1="150" y1="90" x2="185" y2="90" class="dg-line" marker-end="url(#arrow-pr)" />
+
+              <rect x="190" y="65" width="150" height="50" rx="8" class="dg-box" />
+              <text x="265" y="90" class="dg-text-sm">reviewer feedback</text>
+              <line x1="340" y1="90" x2="375" y2="90" class="dg-line" marker-end="url(#arrow-pr)" />
+
+              <rect x="380" y="65" width="140" height="50" rx="8" class="dg-box" />
+              <text x="450" y="90" class="dg-text-sm">revise</text>
+              <line x1="450" y1="65" x2="265" y2="30" class="dg-line-dash" marker-end="url(#arrow-pr)" />
+
+              <line x1="520" y1="90" x2="555" y2="90" class="dg-line" marker-end="url(#arrow-pr)" />
+              <rect x="560" y="65" width="190" height="50" rx="8" class="dg-box-accent" />
+              <text x="655" y="90" class="dg-text-sm">approve &amp; merge / publish</text>
+            </svg>
+            <figcaption>The loop back to revision is the whole point — neither code nor prose gets it right on the first pass.</figcaption>
+          </figure>
+
+          <h2 id="self-edit">Editing yourself before anyone else has to</h2>
+          <p>
+            The best reviewers I've worked with taught me to do a self-review
+            pass before requesting one from anyone else — read the diff as if it
+            were someone else's, and catch the awkward naming and missing
+            context before a reviewer has to spend their attention on it. The
+            same read-it-back-cold pass catches more in a paragraph than any
+            amount of staring at it while you're still writing it.
+          </p>
+
+          <h2 id="takeaways">Takeaways</h2>
+          <ul>
+            <li>If a reviewer keeps asking "why," that's a comment or intro paragraph you forgot to write.</li>
+            <li>Splitting one large PR (or one sprawling paragraph) into smaller, single-purpose pieces almost always makes it easier to approve, or to read.</li>
+            <li>Self-review first — it's the cheapest editing pass available, and it's always available.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="post-footer-nav">
+        <a href="../../index.html">← Back to all posts</a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; 2026 tech.tzepart — placeholder content, not a real blog yet.</p>
+      <div class="footer-links">
+        <a href="https://github.com/tzepart/tech-tzepart" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

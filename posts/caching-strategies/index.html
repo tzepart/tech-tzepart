@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caching Strategies That Actually Held Up — tech.tzepart</title>
+  <meta name="description" content="Lessons from a production incident that taught me to respect TTLs." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="logo" href="../../index.html">tech<span>.</span>tzepart</a>
+      <nav class="main-nav">
+        <a href="../../index.html#posts">Posts</a>
+        <a href="../../index.html#topics">Topics</a>
+        <a href="../../index.html#about">About</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <main>
+    <article class="wrap post-article">
+      <div class="post-header">
+        <span class="tag">Backend</span>
+        <h1>Caching Strategies That Actually Held Up</h1>
+        <div class="meta"><span>Aug 20, 2026</span><span>·</span><span>7 min read</span></div>
+      </div>
+
+      <figure class="post-hero">
+        <svg viewBox="0 0 760 220" role="img" aria-labelledby="hero5-title">
+          <title id="hero5-title">Stacked layers with a clock overlay representing TTL</title>
+          <rect x="230" y="130" width="300" height="34" rx="6" class="dg-box" />
+          <rect x="230" y="94" width="300" height="34" rx="6" class="dg-box" />
+          <rect x="230" y="58" width="300" height="34" rx="6" class="dg-box-accent" />
+          <text x="380" y="75" class="dg-text-sm">edge / CDN cache</text>
+          <text x="380" y="111" class="dg-text-sm">application cache</text>
+          <text x="380" y="147" class="dg-text-sm">database</text>
+          <circle cx="620" cy="75" r="22" class="dg-box-accent" />
+          <line x1="620" y1="75" x2="620" y2="62" class="dg-line" />
+          <line x1="620" y1="75" x2="629" y2="80" class="dg-line" />
+          <text x="620" y="112" class="dg-text-sm">TTL</text>
+        </svg>
+        <figcaption>Every layer needs its own answer to "how stale is too stale?"</figcaption>
+      </figure>
+
+      <div class="post-layout">
+        <aside class="toc">
+          <p class="toc-title">Table of Contents</p>
+          <ol>
+            <li><a href="#incident">The incident that changed how I think about TTLs</a></li>
+            <li><a href="#layers">Layer by layer: where caches live</a></li>
+            <li><a href="#invalidation">Cache invalidation, the honest version</a></li>
+            <li><a href="#patterns">Patterns that survived contact with production</a></li>
+            <li><a href="#diagram">The request path, visualized</a></li>
+          </ol>
+        </aside>
+
+        <div class="post-content">
+          <h2 id="incident">The incident that changed how I think about TTLs</h2>
+          <p>
+            A pricing update went out, and for twenty-five minutes a subset of
+            users saw the old prices. Not because the database update failed —
+            it hadn't — but because an application-layer cache had a six-hour TTL
+            with no invalidation hook wired up. The fix shipped correctly. The
+            cache just hadn't heard about it yet.
+          </p>
+          <blockquote>
+            The bug wasn't the cache. The bug was that nobody had written down
+            what "fresh enough" meant for that specific piece of data.
+          </blockquote>
+
+          <h2 id="layers">Layer by layer: where caches live</h2>
+          <p>
+            A single request can pass through several independent caches before
+            it ever touches a database row, and each one has different
+            invalidation semantics:
+          </p>
+          <ul>
+            <li><strong>Browser cache</strong> — controlled by response headers, invisible to your backend once set.</li>
+            <li><strong>CDN / edge cache</strong> — shared across every user, so a bad TTL here has the widest blast radius.</li>
+            <li><strong>Application cache</strong> (Redis, in-memory) — the one you have the most direct control over, and the one people forget to invalidate.</li>
+            <li><strong>Database query cache</strong> — often invisible until it isn't, and rarely worth managing by hand.</li>
+          </ul>
+
+          <h2 id="invalidation">Cache invalidation, the honest version</h2>
+          <p>
+            "There are only two hard things in computer science" is a cliché for
+            a reason. In practice, the strategies that hold up are the boring
+            ones:
+          </p>
+          <pre><code>// write-through: update the cache in the same
+// transaction as the write, not after it
+async function updatePrice(id, price) {
+  await db.prices.update(id, price);
+  await cache.set(`price:${id}`, price, { ttl: 60 });
+}</code></pre>
+          <p>
+            Time-based expiry alone is a fallback, not a strategy — it just
+            bounds how long you'll be wrong for. Explicit invalidation on write
+            is what actually keeps a cache honest.
+          </p>
+
+          <h2 id="patterns">Patterns that survived contact with production</h2>
+          <ol>
+            <li><strong>Short TTLs by default</strong> — a cache that expires in 60 seconds surprises no one; a six-hour TTL becomes an incident.</li>
+            <li><strong>Cache keys that include a version or hash</strong>, so a deploy can invalidate everything just by changing the key prefix.</li>
+            <li><strong>Explicit invalidation on write</strong> for anything user-facing and price- or state-sensitive.</li>
+            <li><strong>Dashboards for hit rate <em>and</em> staleness</strong> — a high hit rate on stale data is not a win.</li>
+          </ol>
+
+          <h2 id="diagram">The request path, visualized</h2>
+          <figure class="diagram">
+            <svg viewBox="0 0 760 220" role="img" aria-labelledby="diagram5-title">
+              <title id="diagram5-title">A request checking each cache layer before reaching the database</title>
+              <defs>
+                <marker id="arrow-cache" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                  <path d="M0,0 L8,4 L0,8 Z" class="dg-text-sm" fill="currentColor" />
+                </marker>
+              </defs>
+
+              <rect x="10" y="85" width="110" height="46" rx="8" class="dg-box-accent" />
+              <text x="65" y="108" class="dg-text-sm">request</text>
+              <line x1="120" y1="108" x2="155" y2="108" class="dg-line" marker-end="url(#arrow-cache)" />
+
+              <rect x="160" y="85" width="130" height="46" rx="8" class="dg-box" />
+              <text x="225" y="108" class="dg-text-sm">CDN cache</text>
+              <text x="225" y="70" class="dg-text-sm">hit → return</text>
+              <line x1="290" y1="108" x2="325" y2="108" class="dg-line-dash" marker-end="url(#arrow-cache)" />
+              <text x="307" y="140" class="dg-text-sm">miss</text>
+
+              <rect x="330" y="85" width="150" height="46" rx="8" class="dg-box" />
+              <text x="405" y="108" class="dg-text-sm">app cache (Redis)</text>
+              <text x="405" y="70" class="dg-text-sm">hit → return</text>
+              <line x1="480" y1="108" x2="515" y2="108" class="dg-line-dash" marker-end="url(#arrow-cache)" />
+              <text x="497" y="140" class="dg-text-sm">miss</text>
+
+              <rect x="520" y="85" width="130" height="46" rx="8" class="dg-box" />
+              <text x="585" y="108" class="dg-text-sm">database</text>
+
+              <line x1="585" y1="131" x2="585" y2="165" class="dg-line" />
+              <line x1="585" y1="165" x2="225" y2="165" class="dg-line" />
+              <line x1="225" y1="165" x2="225" y2="131" class="dg-line" marker-end="url(#arrow-cache)" />
+              <text x="400" y="185" class="dg-text-sm">result written back into both caches</text>
+            </svg>
+            <figcaption>Each miss is a chance to repopulate the layer above it — that's what makes the next request fast.</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="post-footer-nav">
+        <a href="../../index.html">← Back to all posts</a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; 2026 tech.tzepart — placeholder content, not a real blog yet.</p>
+      <div class="footer-links">
+        <a href="https://github.com/tzepart/tech-tzepart" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

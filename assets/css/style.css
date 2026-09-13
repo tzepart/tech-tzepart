@@ -267,3 +267,239 @@ a {
 .footer-links a:hover {
   color: var(--accent);
 }
+
+/* ---------- Post / article pages ---------- */
+
+.post-article {
+  padding-bottom: 40px;
+}
+
+.post-header {
+  padding: 40px 0 28px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 36px;
+}
+
+.post-header h1 {
+  font-size: clamp(1.6rem, 4vw, 2.3rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 12px 0 14px;
+}
+
+.post-hero {
+  margin: 0 0 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-alt);
+  padding: 12px;
+}
+
+.post-hero svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.post-hero figcaption {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
+.post-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 44px;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .post-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .toc {
+    position: static;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    padding-left: 0;
+    padding-top: 20px;
+  }
+}
+
+.toc {
+  position: sticky;
+  top: 84px;
+  border-left: 2px solid var(--border);
+  padding-left: 16px;
+}
+
+.toc-title {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0 0 10px;
+}
+
+.toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc a {
+  display: block;
+  padding: 4px 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+}
+
+.toc a:hover {
+  color: var(--accent);
+}
+
+.post-content h2 {
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+  margin-top: 40px;
+  margin-bottom: 14px;
+  scroll-margin-top: 84px;
+}
+
+.post-content h3 {
+  font-size: 1.1rem;
+  margin-top: 28px;
+  margin-bottom: 10px;
+  scroll-margin-top: 84px;
+}
+
+.post-content p {
+  margin: 0 0 16px;
+}
+
+.post-content ul,
+.post-content ol {
+  margin: 0 0 16px;
+  padding-left: 22px;
+}
+
+.post-content li {
+  margin-bottom: 6px;
+}
+
+.post-content strong {
+  font-weight: 600;
+}
+
+.post-content blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 0 0 16px;
+  padding: 2px 16px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+figure.diagram {
+  margin: 28px 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-alt);
+  text-align: center;
+  overflow-x: auto;
+}
+
+figure.diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+figure.diagram figcaption {
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.dg-box {
+  fill: var(--bg);
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+
+.dg-box-accent {
+  fill: var(--accent-soft);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+.dg-text {
+  fill: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.dg-text-sm {
+  fill: var(--text-muted);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.dg-line {
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.dg-line-dash {
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  fill: none;
+}
+
+pre {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  margin: 0 0 20px;
+}
+
+pre code {
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  background: var(--bg-alt);
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+.post-footer-nav {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.post-footer-nav a {
+  color: var(--accent);
+  font-weight: 600;
+}

@@ -15,10 +15,18 @@ No build step — just static HTML, CSS, and vanilla JS.
 
 ```
 .
-├── index.html          # main page
+├── index.html            # main page
+├── posts/                # dummy technical posts (TOC, inline SVG diagrams)
+│   ├── rewriting-the-blog-again/
+│   ├── deploying-with-github-pages/
+│   ├── dependency-free-frontends/
+│   ├── minimal-setup-for-side-projects/
+│   ├── caching-strategies/
+│   ├── code-review-and-writing/
+│   └── reading-postmortems/
 ├── assets/
-│   ├── css/style.css   # styles (incl. light/dark theme)
-│   └── js/main.js      # theme toggle
+│   ├── css/style.css     # styles (incl. light/dark theme, article/TOC/diagram styles)
+│   └── js/main.js        # theme toggle
 └── .github/workflows/static.yml  # GitHub Pages deploy workflow
 ```
 
