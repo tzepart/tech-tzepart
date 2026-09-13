@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event-Driven Architecture, Explained with Diagrams — tech.tzepart</title>
+  <meta name="description" content="Producers, brokers, and consumers — with a sequence diagram, a retry/DLQ flowchart, and a broker comparison table. Content authored in Markdown and rendered client-side." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="logo" href="../../index.html">tech<span>.</span>tzepart</a>
+      <nav class="main-nav">
+        <a href="../../index.html#posts">Posts</a>
+        <a href="../../index.html#topics">Topics</a>
+        <a href="../../index.html#about">About</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <main>
+    <article class="wrap post-article">
+      <div class="post-header">
+        <span class="tag">Architecture</span>
+        <h1>Event-Driven Architecture, Explained with Diagrams</h1>
+        <div class="meta"><span>Sep 14, 2026</span><span>·</span><span>7 min read</span></div>
+      </div>
+
+      <figure class="post-hero">
+        <svg viewBox="0 0 760 220" role="img" aria-labelledby="hero8-title">
+          <title id="hero8-title">A producer connected through a broker to two independent consumers</title>
+          <rect x="20" y="90" width="120" height="46" rx="8" class="dg-box" />
+          <text x="80" y="113" class="dg-text-sm">Producer</text>
+
+          <line x1="140" y1="113" x2="330" y2="70" class="dg-line" />
+          <circle cx="380" cy="110" r="45" class="dg-box-accent" />
+          <text x="380" y="110" class="dg-text">Broker</text>
+
+          <line x1="430" y1="90" x2="600" y2="55" class="dg-line" />
+          <line x1="430" y1="130" x2="600" y2="165" class="dg-line" />
+
+          <rect x="610" y="30" width="130" height="46" rx="8" class="dg-box" />
+          <text x="675" y="53" class="dg-text-sm">Payments</text>
+
+          <rect x="610" y="142" width="130" height="46" rx="8" class="dg-box" />
+          <text x="675" y="165" class="dg-text-sm">Inventory</text>
+        </svg>
+        <figcaption>One event, two consumers, zero coupling between them.</figcaption>
+      </figure>
+
+      <div class="post-layout">
+        <aside class="toc">
+          <p class="toc-title">Table of Contents</p>
+          <ol id="tocList"></ol>
+        </aside>
+
+        <div class="post-content" id="markdownContent">
+          <p class="markdown-loading">Loading post…</p>
+        </div>
+      </div>
+
+      <div class="post-footer-nav">
+        <a href="../../index.html">← Back to all posts</a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; 2026 tech.tzepart — placeholder content, not a real blog yet.</p>
+      <div class="footer-links">
+        <a href="https://github.com/tzepart/tech-tzepart" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="../../assets/js/main.js"></script>
+  <script>
+    (function () {
+      var contentEl = document.getElementById("markdownContent");
+      var tocList = document.getElementById("tocList");
+
+      function slugify(text) {
+        return text
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-");
+      }
+
+      fetch("post.md")
+        .then(function (res) {
+          if (!res.ok) throw new Error("Failed to fetch post.md: " + res.status);
+          return res.text();
+        })
+        .then(function (markdown) {
+          contentEl.innerHTML = marked.parse(markdown);
+
+          contentEl.querySelectorAll("h2").forEach(function (heading) {
+            var id = slugify(heading.textContent);
+            heading.id = id;
+
+            var li = document.createElement("li");
+            var a = document.createElement("a");
+            a.href = "#" + id;
+            a.textContent = heading.textContent;
+            li.appendChild(a);
+            tocList.appendChild(li);
+          });
+
+          contentEl.querySelectorAll("pre code.language-mermaid").forEach(function (block) {
+            var div = document.createElement("div");
+            div.className = "mermaid";
+            div.textContent = block.textContent;
+            block.parentElement.replaceWith(div);
+          });
+
+          var isDark =
+            document.documentElement.getAttribute("data-theme") === "dark" ||
+            (!document.documentElement.getAttribute("data-theme") &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+          mermaid.initialize({ startOnLoad: false, theme: isDark ? "dark" : "default" });
+          mermaid.run({ nodes: contentEl.querySelectorAll(".mermaid") });
+        })
+        .catch(function (err) {
+          contentEl.innerHTML = '<p class="markdown-loading">Could not load post content.</p>';
+          console.error(err);
+        });
+    })();
+  </script>
+</body>
+</html>

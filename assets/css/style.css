@@ -503,3 +503,44 @@ pre code {
   color: var(--accent);
   font-weight: 600;
 }
+
+/* ---------- Client-rendered markdown posts ---------- */
+
+.markdown-loading {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 20px;
+  font-size: 0.92rem;
+}
+
+.post-content th,
+.post-content td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.post-content th {
+  background: var(--bg-alt);
+  font-weight: 600;
+}
+
+.post-content .mermaid {
+  margin: 28px 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-alt);
+  overflow-x: auto;
+  text-align: center;
+}
+
+.post-content .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
