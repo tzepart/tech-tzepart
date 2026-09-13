@@ -1,0 +1,88 @@
+<h2>The incident that changed how I think about TTLs</h2>
+<p>
+  A pricing update went out, and for twenty-five minutes a subset of
+  users saw the old prices. Not because the database update failed —
+  it hadn't — but because an application-layer cache had a six-hour TTL
+  with no invalidation hook wired up. The fix shipped correctly. The
+  cache just hadn't heard about it yet.
+</p>
+<blockquote>
+  The bug wasn't the cache. The bug was that nobody had written down
+  what "fresh enough" meant for that specific piece of data.
+</blockquote>
+
+<h2>Layer by layer: where caches live</h2>
+<p>
+  A single request can pass through several independent caches before
+  it ever touches a database row, and each one has different
+  invalidation semantics:
+</p>
+<ul>
+  <li><strong>Browser cache</strong> — controlled by response headers, invisible to your backend once set.</li>
+  <li><strong>CDN / edge cache</strong> — shared across every user, so a bad TTL here has the widest blast radius.</li>
+  <li><strong>Application cache</strong> (Redis, in-memory) — the one you have the most direct control over, and the one people forget to invalidate.</li>
+  <li><strong>Database query cache</strong> — often invisible until it isn't, and rarely worth managing by hand.</li>
+</ul>
+
+<h2>Cache invalidation, the honest version</h2>
+<p>
+  "There are only two hard things in computer science" is a cliché for
+  a reason. In practice, the strategies that hold up are the boring
+  ones:
+</p>
+<pre><code>// write-through: update the cache in the same
+// transaction as the write, not after it
+async function updatePrice(id, price) {
+  await db.prices.update(id, price);
+  await cache.set(`price:${id}`, price, { ttl: 60 });
+}</code></pre>
+<p>
+  Time-based expiry alone is a fallback, not a strategy — it just
+  bounds how long you'll be wrong for. Explicit invalidation on write
+  is what actually keeps a cache honest.
+</p>
+
+<h2>Patterns that survived contact with production</h2>
+<ol>
+  <li><strong>Short TTLs by default</strong> — a cache that expires in 60 seconds surprises no one; a six-hour TTL becomes an incident.</li>
+  <li><strong>Cache keys that include a version or hash</strong>, so a deploy can invalidate everything just by changing the key prefix.</li>
+  <li><strong>Explicit invalidation on write</strong> for anything user-facing and price- or state-sensitive.</li>
+  <li><strong>Dashboards for hit rate <em>and</em> staleness</strong> — a high hit rate on stale data is not a win.</li>
+</ol>
+
+<h2>The request path, visualized</h2>
+<figure class="diagram">
+  <svg viewBox="0 0 760 220" role="img" aria-labelledby="diagram5-title">
+    <title id="diagram5-title">A request checking each cache layer before reaching the database</title>
+    <defs>
+      <marker id="arrow-cache" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+        <path d="M0,0 L8,4 L0,8 Z" class="dg-text-sm" fill="currentColor" />
+      </marker>
+    </defs>
+
+    <rect x="10" y="85" width="110" height="46" rx="8" class="dg-box-accent" />
+    <text x="65" y="108" class="dg-text-sm">request</text>
+    <line x1="120" y1="108" x2="155" y2="108" class="dg-line" marker-end="url(#arrow-cache)" />
+
+    <rect x="160" y="85" width="130" height="46" rx="8" class="dg-box" />
+    <text x="225" y="108" class="dg-text-sm">CDN cache</text>
+    <text x="225" y="70" class="dg-text-sm">hit → return</text>
+    <line x1="290" y1="108" x2="325" y2="108" class="dg-line-dash" marker-end="url(#arrow-cache)" />
+    <text x="307" y="140" class="dg-text-sm">miss</text>
+
+    <rect x="330" y="85" width="150" height="46" rx="8" class="dg-box" />
+    <text x="405" y="108" class="dg-text-sm">app cache (Redis)</text>
+    <text x="405" y="70" class="dg-text-sm">hit → return</text>
+    <line x1="480" y1="108" x2="515" y2="108" class="dg-line-dash" marker-end="url(#arrow-cache)" />
+    <text x="497" y="140" class="dg-text-sm">miss</text>
+
+    <rect x="520" y="85" width="130" height="46" rx="8" class="dg-box" />
+    <text x="585" y="108" class="dg-text-sm">database</text>
+
+    <line x1="585" y1="131" x2="585" y2="165" class="dg-line" />
+    <line x1="585" y1="165" x2="225" y2="165" class="dg-line" />
+    <line x1="225" y1="165" x2="225" y2="131" class="dg-line" marker-end="url(#arrow-cache)" />
+    <text x="400" y="185" class="dg-text-sm">result written back into both caches</text>
+  </svg>
+  <figcaption>Each miss is a chance to repopulate the layer above it — that's what makes the next request fast.</figcaption>
+</figure>

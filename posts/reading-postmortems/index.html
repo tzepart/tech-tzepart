@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reading Postmortems for Fun — tech.tzepart</title>
-  <meta name="description" content="A collection of the outages I keep coming back to, and why." />
+  <title>tech.tzepart</title>
   <link rel="stylesheet" href="../../assets/css/style.css" />
 </head>
 <body>
@@ -23,114 +22,21 @@
   <main>
     <article class="wrap post-article">
       <div class="post-header">
-        <span class="tag">Systems</span>
-        <h1>Reading Postmortems for Fun</h1>
-        <div class="meta"><span>Aug 2, 2026</span><span>·</span><span>6 min read</span></div>
+        <span class="tag" id="postTag">…</span>
+        <h1 id="postTitle">Loading…</h1>
+        <div class="meta"><span id="postDate"></span><span>·</span><span id="postReadTime"></span></div>
       </div>
 
-      <figure class="post-hero">
-        <svg viewBox="0 0 760 200" role="img" aria-labelledby="hero7-title">
-          <title id="hero7-title">A magnifying glass over a document with a warning triangle</title>
-          <rect x="290" y="40" width="140" height="120" rx="8" class="dg-box" />
-          <line x1="310" y1="65" x2="410" y2="65" class="dg-line" />
-          <line x1="310" y1="85" x2="410" y2="85" class="dg-line" />
-          <line x1="310" y1="105" x2="380" y2="105" class="dg-line" />
-          <circle cx="470" cy="120" r="34" class="dg-box-accent" style="fill:none;" />
-          <line x1="493" y1="143" x2="515" y2="165" class="dg-line-dash" />
-          <path d="M460 110 l10 -18 l10 18 z" class="dg-box-accent" />
-          <text x="470" y="128" class="dg-text" font-size="16">!</text>
-        </svg>
-        <figcaption>Someone else's 3 a.m. page, turned into a reading list.</figcaption>
-      </figure>
+      <div id="heroSlot"></div>
 
       <div class="post-layout">
         <aside class="toc">
           <p class="toc-title">Table of Contents</p>
-          <ol>
-            <li><a href="#why">Why postmortems are good reading</a></li>
-            <li><a href="#contains">What a good one contains</a></li>
-            <li><a href="#timeline">The incident timeline shape</a></li>
-            <li><a href="#patterns">Patterns across dozens of postmortems</a></li>
-            <li><a href="#list">Building your own reading habit</a></li>
-          </ol>
+          <ol id="tocList"></ol>
         </aside>
 
-        <div class="post-content">
-          <h2 id="why">Why postmortems are good reading</h2>
-          <p>
-            A well-written postmortem is one of the few places in engineering
-            where you get an honest, detailed account of exactly how something
-            went wrong, with none of the marketing gloss applied to product
-            launches. Reading them is cheap access to expensive lessons someone
-            else already paid for.
-          </p>
-
-          <h2 id="contains">What a good one contains</h2>
-          <ul>
-            <li><strong>A precise timeline</strong> — timestamps, not vague phases.</li>
-            <li><strong>The actual trigger</strong>, separated from the conditions that let it cascade.</li>
-            <li><strong>What made detection slow or fast</strong>, in concrete terms.</li>
-            <li><strong>Follow-up actions with owners</strong>, not just "we will improve monitoring."</li>
-          </ul>
-
-          <h2 id="timeline">The incident timeline shape</h2>
-          <p>
-            Almost every postmortem worth reading follows the same rough shape,
-            even when the root cause is completely different:
-          </p>
-          <figure class="diagram">
-            <svg viewBox="0 0 780 200" role="img" aria-labelledby="diagram7-title">
-              <title id="diagram7-title">Incident timeline from trigger to postmortem</title>
-              <defs>
-                <marker id="arrow-inc" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
-                  <path d="M0,0 L8,4 L0,8 Z" class="dg-text-sm" fill="currentColor" />
-                </marker>
-              </defs>
-              <line x1="30" y1="100" x2="750" y2="100" class="dg-line" marker-end="url(#arrow-inc)" />
-
-              <circle cx="80" cy="100" r="7" class="dg-box-accent" />
-              <text x="80" y="125" class="dg-text-sm">trigger</text>
-              <text x="80" y="70" class="dg-text-sm">T+0m</text>
-
-              <circle cx="240" cy="100" r="7" class="dg-box" />
-              <text x="240" y="125" class="dg-text-sm">detected</text>
-              <text x="240" y="70" class="dg-text-sm">T+4m</text>
-
-              <circle cx="400" cy="100" r="7" class="dg-box" />
-              <text x="400" y="125" class="dg-text-sm">triaged</text>
-              <text x="400" y="70" class="dg-text-sm">T+12m</text>
-
-              <circle cx="560" cy="100" r="7" class="dg-box" />
-              <text x="560" y="125" class="dg-text-sm">mitigated</text>
-              <text x="560" y="70" class="dg-text-sm">T+35m</text>
-
-              <circle cx="700" cy="100" r="7" class="dg-box-accent" />
-              <text x="700" y="125" class="dg-text-sm">resolved</text>
-              <text x="700" y="70" class="dg-text-sm">T+58m</text>
-            </svg>
-            <figcaption>The gap between "detected" and "triaged" is usually where the most fixable time gets lost.</figcaption>
-          </figure>
-
-          <h2 id="patterns">Patterns across dozens of postmortems</h2>
-          <p>
-            After enough of these, the specifics blur together but the shapes
-            repeat:
-          </p>
-          <ol>
-            <li>The root cause is rarely one thing — it's a change plus a monitoring gap plus a runbook nobody had rehearsed.</li>
-            <li>The fix that ships fastest is often a manual mitigation, and the real fix — the one that prevents a repeat — lands weeks later as a follow-up item.</li>
-            <li>Alerting on symptoms (error rate, latency) catches more real incidents than alerting on causes (CPU, disk) ever does.</li>
-          </ol>
-
-          <h2 id="list">Building your own reading habit</h2>
-          <p>
-            I keep a running list of public postmortems, sorted loosely by what
-            they're good examples of: detection gaps, cascading failures,
-            deploy-related regressions, and "the runbook was wrong" incidents.
-            Revisiting the list before designing a new system is a quick way to
-            check whether you're about to reintroduce a failure mode someone
-            else already wrote up in detail.
-          </p>
+        <div class="post-content" id="postContent">
+          <p class="markdown-loading">Loading post…</p>
         </div>
       </div>
 
@@ -149,6 +55,9 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
   <script src="../../assets/js/main.js"></script>
+  <script src="../../assets/js/post.js"></script>
 </body>
 </html>
