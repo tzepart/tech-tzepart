@@ -4,24 +4,6 @@ date: 2026-09-12
 summary: A short retrospective on over-engineering a static site, chasing the perfect build tool, and eventually just shipping plain HTML.
 ---
 
-<figure class="post-hero">
-  <svg viewBox="0 0 760 260" role="img" aria-labelledby="hero1-title">
-    <title id="hero1-title">Four stacked browser windows, each simpler than the last</title>
-    <rect x="40" y="170" width="300" height="60" rx="8" class="dg-box" />
-    <rect x="70" y="130" width="300" height="60" rx="8" class="dg-box" />
-    <rect x="100" y="90" width="300" height="60" rx="8" class="dg-box" />
-    <rect x="130" y="40" width="300" height="60" rx="8" class="dg-box-accent" />
-    <circle cx="150" cy="55" r="4" class="dg-box-accent" />
-    <circle cx="163" cy="55" r="4" class="dg-box-accent" />
-    <circle cx="176" cy="55" r="4" class="dg-box-accent" />
-    <text x="280" y="73" class="dg-text">&lt;html&gt; only</text>
-    <text x="250" y="123" class="dg-text-sm">v3 · static site generator</text>
-    <text x="220" y="163" class="dg-text-sm">v2 · React SPA</text>
-    <text x="190" y="203" class="dg-text-sm">v1 · Jekyll</text>
-  </svg>
-  <figcaption>Four versions of the same idea, each one lighter than the last.</figcaption>
-</figure>
-
 <h2>A brief history of bad decisions</h2>
 <p>
   Every year or so I get the urge to rewrite this blog. Not because the old

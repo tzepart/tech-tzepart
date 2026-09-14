@@ -4,15 +4,6 @@ date: 2026-09-14
 summary: Several scenarios of the future of dev in AI age
 ---
 
-<figure class="post-hero">
-  <svg viewBox="0 0 400 140" role="img" aria-labelledby="template-hero-title">
-    <title id="template-hero-title">Placeholder hero illustration</title>
-    <circle cx="200" cy="70" r="50" class="dg-box-accent" />
-    <text x="200" y="70" class="dg-text">hero</text>
-  </svg>
-  <figcaption>Optional hero caption.</figcaption>
-</figure>
-
 ## First section heading
 
 Regular paragraph content goes here — normal Markdown, including **bold**,

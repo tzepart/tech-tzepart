@@ -4,28 +4,6 @@ date: 2026-09-14
 summary: Producers, brokers, and consumers — with a sequence diagram, a retry flowchart, and a broker comparison table.
 ---
 
-<figure class="post-hero">
-  <svg viewBox="0 0 760 220" role="img" aria-labelledby="hero8-title">
-    <title id="hero8-title">A producer connected through a broker to two independent consumers</title>
-    <rect x="20" y="90" width="120" height="46" rx="8" class="dg-box" />
-    <text x="80" y="113" class="dg-text-sm">Producer</text>
-
-    <line x1="140" y1="113" x2="330" y2="70" class="dg-line" />
-    <circle cx="380" cy="110" r="45" class="dg-box-accent" />
-    <text x="380" y="110" class="dg-text">Broker</text>
-
-    <line x1="430" y1="90" x2="600" y2="55" class="dg-line" />
-    <line x1="430" y1="130" x2="600" y2="165" class="dg-line" />
-
-    <rect x="610" y="30" width="130" height="46" rx="8" class="dg-box" />
-    <text x="675" y="53" class="dg-text-sm">Payments</text>
-
-    <rect x="610" y="142" width="130" height="46" rx="8" class="dg-box" />
-    <text x="675" y="165" class="dg-text-sm">Inventory</text>
-  </svg>
-  <figcaption>One event, two consumers, zero coupling between them.</figcaption>
-</figure>
-
 ## Why event-driven?
 
 In a request/response system, a service calls another service and waits for an
