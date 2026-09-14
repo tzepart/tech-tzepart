@@ -32,15 +32,19 @@ Create `src/posts/<category>/<slug>/index.md` (or
 ---
 title: Async patterns in Python   # required
 date: 2026-09-20                  # required, YYYY-MM-DD
-tags: [python, asyncio]           # optional
-summary: One sentence for the homepage.  # optional
+tags: [python, asyncio]           # optional, filterable on the homepage
+summary: One sentence for the homepage card.  # optional
+cover: assets/cover.png           # optional card image, must be inside assets/
 ---
 
 Post body in Markdown.
 ```
 
 That's all — category and sub-category come from the directory path, and the
-homepage is regenerated from the directory tree on every build.
+homepage is regenerated from the directory tree on every build. The homepage
+shows every post as a card (a colored placeholder is used when there's no
+`cover`) and can be filtered by category and tag; filters are reflected in the
+URL, e.g. `?category=architecture&tag=caching`.
 
 - **Extra pages:** any other `.md` file in the post directory becomes its own
   page at `<post-url>/<filename>/`, linked from an "In this post" list. Give it

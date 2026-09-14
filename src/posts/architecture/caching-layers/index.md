@@ -1,7 +1,8 @@
 ---
 title: Caching Layers, From Browser to Database
 date: 2026-09-15
-tags: [caching, performance]
+tags: [caching, performance, distributed-systems]
+cover: assets/cache-layers.svg
 summary: A dummy walkthrough of where caches live, how reads fall through them, and how entries get invalidated — with images and Mermaid diagrams.
 ---
 

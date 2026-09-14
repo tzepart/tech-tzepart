@@ -1,6 +1,7 @@
 ---
 title: Event-Driven Architecture, Explained with Diagrams
 date: 2026-09-14
+tags: [messaging, distributed-systems]
 summary: Producers, brokers, and consumers — with a sequence diagram, a retry flowchart, and a broker comparison table.
 ---
 

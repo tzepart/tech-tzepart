@@ -29,8 +29,8 @@ can be layered on without touching discovery/rendering:
    `index.md` is a post; it must be exactly 2 or 3 levels deep
    (`<category>/<slug>` or `<category>/<sub-category>/<slug>`), and posts
    can't be nested in other posts. Category/sub-category come from the path,
-   never from frontmatter. Frontmatter: `title` and `date` required, `tags`
-   and `summary` optional. Other `.md` and `.ipynb` files in the directory are
+   never from frontmatter. Frontmatter: `title` and `date` required, `tags`,
+   `summary` and `cover` (a file inside the post's `assets/`) optional. Other `.md` and `.ipynb` files in the directory are
    extra pages (optional `title`, `order` — in frontmatter for `.md`, in
    top-level notebook `metadata` for `.ipynb`). Notebooks are rendered from
    saved outputs without executing them or adding dependencies (Pygments for
@@ -44,8 +44,12 @@ can be layered on without touching discovery/rendering:
    pages (one directory deeper) relative URLs get a `../` prefix.
 3. **Emit** — `dist/` is cleared, `src/static/` copied to `dist/static/`,
    each post/extra page written as `.../index.html` (clean URLs), each post's
-   `assets/` copied alongside, and `dist/index.html` generated from the
-   category tree.
+   `assets/` copied alongside, and `dist/index.html` generated as a grid of
+   post cards (newest first) plus category and tag filter chips. Cards carry
+   `data-category`/`data-tags` (tag slugs); `static/filter.js` filters them
+   client-side and mirrors state in `?category=…&tag=…`, which post pages
+   link to from their breadcrumb and tags. Cards without `cover` get a
+   gradient whose hue is derived from the category name (crc32, stable).
 
 Output must stay deterministic (sorted traversal, no build timestamps) —
 running the build twice must produce byte-identical `dist/`.
@@ -55,10 +59,12 @@ running the build twice must produce byte-identical `dist/`.
 - All links in templates are relative via the `root` variable (`./`,
   `../../../`, …) because GitHub Pages project sites are served from a
   subpath — never use root-absolute `/...` URLs.
-- JavaScript is limited to the conditional Mermaid include and the
-  full-width toggle (`static/layout.js` + a one-line inline script in
-  `<head>` that applies the saved `localStorage` choice before first paint).
-  The toggle button is `hidden` until JS runs, so no-JS pages stay clean.
+- JavaScript is limited to the conditional Mermaid include, the homepage
+  filters (`static/filter.js`), and the full-width toggle
+  (`static/layout.js` + a one-line inline script in `<head>` that applies
+  the saved `localStorage` choice before first paint). JS-only controls are
+  `hidden` in the markup until their script runs, so no-JS pages stay clean
+  (all cards are simply shown).
   Theme is `prefers-color-scheme` only.
 - One stylesheet, system font stack. Inline SVG diagrams use the shared
   `dg-*` classes so they follow the theme.

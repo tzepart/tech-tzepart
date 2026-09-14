@@ -9,6 +9,8 @@ import json
 import re
 import shutil
 import sys
+import zlib
+from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
@@ -62,6 +64,7 @@ class Post:
     date: date
     tags: list[str]
     summary: str | None
+    cover: str | None
     body: str
     has_mermaid: bool
     pages: list[ExtraPage] = field(default_factory=list)
@@ -71,8 +74,12 @@ class Post:
         return self.rel[0]
 
     @property
-    def subcategory(self) -> str | None:
-        return self.rel[1] if len(self.rel) == 3 else None
+    def cover_url(self) -> str | None:
+        return self.url + self.cover if self.cover else None
+
+    @property
+    def hue(self) -> int:
+        return zlib.crc32(self.category.encode()) % 360
 
     @property
     def breadcrumb(self) -> list[str]:
@@ -89,6 +96,10 @@ class Post:
 
 def humanize(name: str) -> str:
     return re.sub(r"[-_]+", " ", name).strip().title()
+
+
+def slugify(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
 
 
 def render_markdown(text: str) -> tuple[str, bool]:
@@ -256,6 +267,19 @@ def load_post(post_dir: Path) -> Post:
     tags = meta.get("tags") or []
     if not isinstance(tags, list) or not all(isinstance(t, (str, int, float)) for t in tags):
         raise BuildError(f"{index_path.relative_to(ROOT)}: 'tags' must be a list")
+    if any(not slugify(str(t)) for t in tags):
+        raise BuildError(f"{index_path.relative_to(ROOT)}: every tag needs at least one letter or digit")
+
+    cover = meta.get("cover")
+    if cover is not None:
+        assets_dir = (post_dir / POST_ASSETS_DIRNAME).resolve()
+        cover_path = (post_dir / str(cover)).resolve()
+        if not cover_path.is_file() or assets_dir not in cover_path.parents:
+            raise BuildError(
+                f"{index_path.relative_to(ROOT)}: 'cover' must point to an existing file inside "
+                f"{POST_ASSETS_DIRNAME}/ (e.g. {POST_ASSETS_DIRNAME}/cover.png)"
+            )
+        cover = cover_path.relative_to(post_dir.resolve()).as_posix()
 
     summary = meta.get("summary")
     body, has_mermaid = render_markdown(content)
@@ -277,32 +301,30 @@ def load_post(post_dir: Path) -> Post:
         date=parse_date(meta.get("date"), index_path),
         tags=[str(t) for t in tags],
         summary=str(summary).strip() if summary else None,
+        cover=cover,
         body=rewrite_relative_urls(body, from_subpage=False),
         has_mermaid=has_mermaid,
         pages=pages,
     )
 
 
-def group_by_category(posts: list[Post]) -> list[dict]:
-    newest_first = sorted(posts, key=lambda p: (-p.date.toordinal(), p.title))
-    categories: dict[str, dict] = {}
-    for post in newest_first:
-        category = categories.setdefault(post.category, {"posts": [], "subcategories": {}})
-        if post.subcategory:
-            category["subcategories"].setdefault(post.subcategory, []).append(post)
-        else:
-            category["posts"].append(post)
-    return [
-        {
-            "name": humanize(name),
-            "posts": categories[name]["posts"],
-            "subcategories": [
-                {"name": humanize(sub), "posts": sub_posts}
-                for sub, sub_posts in sorted(categories[name]["subcategories"].items())
-            ],
-        }
-        for name in sorted(categories)
-    ]
+def homepage_context(posts: list[Post]) -> dict:
+    categories = Counter(post.category for post in posts)
+    tag_counts = Counter(slug for post in posts for slug in {slugify(tag) for tag in post.tags})
+    tag_labels: dict[str, str] = {}
+    for post in posts:
+        for tag in post.tags:
+            tag_labels.setdefault(slugify(tag), tag)
+    return {
+        "posts": sorted(posts, key=lambda p: (-p.date.toordinal(), p.title)),
+        "categories": [
+            {"slug": slug, "label": humanize(slug), "count": count} for slug, count in sorted(categories.items())
+        ],
+        "tags": [
+            {"slug": slug, "label": tag_labels[slug], "count": tag_counts[slug]}
+            for slug in sorted(tag_counts, key=lambda s: tag_labels[s].lower())
+        ],
+    }
 
 
 class Site:
@@ -315,6 +337,7 @@ class Site:
             lstrip_blocks=True,
             keep_trailing_newline=True,
         )
+        self.env.filters["slugify"] = slugify
 
     def emit(self, parts: tuple[str, ...], template: str, **context: object) -> None:
         context.setdefault("description", None)
@@ -379,7 +402,7 @@ def main() -> int:
     site = Site()
     for post in posts:
         site.emit_post(post)
-    site.emit((), "index.html", categories=group_by_category(posts))
+    site.emit((), "index.html", **homepage_context(posts))
 
     extra_count = sum(len(p.pages) for p in posts)
     print(f"Built {len(posts)} post(s) and {extra_count} extra page(s) into {DIST.relative_to(ROOT)}/")

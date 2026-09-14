@@ -1,6 +1,7 @@
 ---
 title: Why I Rewrote My Blog for the Fourth Time
 date: 2026-09-12
+tags: [static-sites, tooling]
 summary: A short retrospective on over-engineering a static site, chasing the perfect build tool, and eventually just shipping plain HTML.
 ---
 

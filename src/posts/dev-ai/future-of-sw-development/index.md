@@ -1,6 +1,7 @@
 ---
 title: Future of SW development
 date: 2026-09-14
+tags: [dev, ai]
 summary: Several scenarios of the future of dev in AI age
 ---
 

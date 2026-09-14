@@ -1,7 +1,7 @@
 ---
 title: Prompt Length Analysis in a Notebook
 date: 2026-09-15
-tags: [notebook, llm]
+tags: [notebook, llm, ai]
 summary: A dummy post whose real content is a Jupyter notebook, rendered as a page by the build.
 ---
 

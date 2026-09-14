@@ -15,7 +15,7 @@
 </head>
 <body>
   <header class="site-header">
-    <div class="wrap">
+    <div class="wrap wrap-wide">
       <a class="logo" href="{{ root }}">tech<span>.</span>tzepart</a>
       <button class="width-toggle" type="button" aria-pressed="false" aria-label="Full width" title="Full width" hidden>
         <svg class="icon-wide" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -28,12 +28,12 @@
     </div>
   </header>
 
-  <main class="wrap">
+  <main class="{% block main_class %}wrap{% endblock %}">
 {% block content %}{% endblock %}
   </main>
 
   <footer class="site-footer">
-    <div class="wrap">
+    <div class="wrap wrap-wide">
       <a href="https://github.com/tzepart/tech-tzepart">GitHub</a>
     </div>
   </footer>
@@ -48,5 +48,6 @@
     mermaid.run();
   </script>
 {% endif %}
+{% block scripts %}{% endblock %}
 </body>
 </html>
