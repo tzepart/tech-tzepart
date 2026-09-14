@@ -1,92 +1,76 @@
 # tech-tzepart
 
-A personal tech blog, built as a plain static site and deployed to GitHub Pages.
+A personal tech blog. Markdown files are turned into static HTML by a small
+Python script (no static site generator), and the output is deployed to
+GitHub Pages.
 
 **Live site:** https://tzepart.github.io/tech-tzepart/
 
-## Status
-
-The homepage currently ships with placeholder/dummy posts and copy while the
-real content and design are still in progress.
-
-## Stack
-
-No build step — just static HTML, CSS, and vanilla JS. Posts and homepage
-listings are data-driven: everything is rendered client-side from
-`posts/posts.json` plus small content files, so adding a post never means
-hand-editing the homepage.
+## Layout
 
 ```
 .
-├── index.html               # homepage shell; content is rendered by assets/js/home.js
-├── posts/
-│   ├── posts.json           # manifest: one entry per post (metadata for homepage + post page)
-│   ├── _template/            # copy this folder to start a new post
-│   │   ├── index.html
-│   │   ├── content.html      # starter HTML post body (delete if writing Markdown)
-│   │   ├── content.md        # starter Markdown post body (delete if writing HTML)
-│   │   └── hero.html         # optional hero illustration (delete to omit)
-│   └── <slug>/
-│       ├── index.html        # identical shared shell (copied verbatim, never edited)
-│       ├── content.html OR content.md   # the post body — pick one format
-│       └── hero.html         # optional hero illustration/diagram figure
-├── assets/
-│   ├── css/style.css        # styles (theme, article/TOC/diagram/table/mermaid styles)
-│   └── js/
-│       ├── main.js          # theme toggle
-│       ├── home.js          # renders featured/grid/topic pills from posts.json
-│       └── post.js          # renders a single post page (TOC, mermaid, content)
-└── .github/workflows/static.yml  # GitHub Pages deploy workflow
+├── src/
+│   ├── posts/
+│   │   └── <category>/[<sub-category>/]<post-slug>/
+│   │       ├── index.md      # required — main content + YAML frontmatter
+│   │       ├── <extra>.md    # optional — extra page(s) of this post
+│   │       └── assets/       # optional — images etc., copied as-is
+│   ├── templates/            # Jinja2: base.html, index.html, post.html
+│   └── static/style.css      # the only stylesheet, copied to dist/static/
+├── build.py                  # src/ → dist/
+├── requirements.txt
+└── .github/workflows/deploy.yml
 ```
 
-## Adding a new post
+## Writing a post
 
-Posts can be written as **HTML or Markdown** — both go through the same
-rendering pipeline (shared header/footer, automatic Table of Contents built
-from `<h2>`/`##` headings, and [Mermaid](https://mermaid.js.org/) diagram
-support in both formats).
+Create `src/posts/<category>/<slug>/index.md` (or
+`src/posts/<category>/<sub-category>/<slug>/index.md`):
 
-1. Copy `posts/_template/` to `posts/<your-slug>/`.
-2. Delete whichever starter content file you don't need — keep
-   `content.html` for an HTML post, or `content.md` for a Markdown post.
-   Edit the one you kept. Delete `hero.html` if you don't want a hero
-   illustration.
-3. Add one entry to `posts/posts.json`:
-   ```json
-   {
-     "slug": "your-slug",
-     "title": "Your Post Title",
-     "tag": "SomeTag",
-     "date": "2026-09-20",
-     "dateLabel": "Sep 20, 2026",
-     "readTime": "5 min",
-     "excerpt": "One sentence shown on the homepage card.",
-     "format": "html",
-     "featured": false
-   }
-   ```
-   `format` must be `"html"` or `"md"` and must match the content file you
-   kept. Set `"featured": true` on at most one post to control the homepage
-   hero slot (the newest post wins if none is marked featured).
-4. That's it — the homepage picks up the new post automatically (sorted by
-   `date`), and `posts/<your-slug>/` renders it using the shared layout.
+```markdown
+---
+title: Async patterns in Python   # required
+date: 2026-09-20                  # required, YYYY-MM-DD
+tags: [python, asyncio]           # optional
+summary: One sentence for the homepage.  # optional
+---
 
-Don't edit `posts/<slug>/index.html` itself — it's the same file in every
-post folder and just bootstraps `assets/js/post.js`, which reads the slug
-from the URL and does the rendering.
+Post body in Markdown.
+```
+
+That's all — category and sub-category come from the directory path, and the
+homepage is regenerated from the directory tree on every build.
+
+- **Extra pages:** any other `.md` file in the post directory becomes its own
+  page at `<post-url>/<filename>/`, linked from an "In this post" list. Give it
+  a `title` in frontmatter (defaults to the filename) and optionally an integer
+  `order` (otherwise pages are sorted by filename).
+- **Links and images:** use paths relative to the post directory, e.g.
+  `![chart](assets/chart.png)` or `[benchmarks](benchmarks.md)` — they work
+  from both the main page and extra pages.
+- **Code:** fenced code blocks with a language (```` ```python ````) are
+  syntax-highlighted at build time.
+- **Diagrams:** ```` ```mermaid ```` blocks render as Mermaid diagrams. Only
+  pages that contain one load the Mermaid script; all other pages are JS-free.
+- **Raw HTML** (e.g. inline SVG figures using the `dg-*` classes in
+  `style.css`) is passed through unchanged.
 
 ## Local development
 
-This site loads content via `fetch()`, so it needs to be served over HTTP —
-opening `index.html` directly via `file://` won't work.
-
 ```bash
-python3 -m http.server 8000
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+python build.py
+cd dist && python -m http.server 8000
 ```
 
-Then visit `http://localhost:8000`.
+Then visit `http://localhost:8000`. `build.py` wipes and regenerates `dist/`
+on every run.
 
 ## Deployment
 
-Pushing to `main` triggers the `Deploy static content to Pages` GitHub Actions
-workflow, which publishes the repository root to GitHub Pages.
+Pushing to `main` runs `.github/workflows/deploy.yml`, which installs the
+requirements, runs `python build.py`, and publishes `dist/` to GitHub Pages.
+In the repository settings, Pages must be set to deploy from **GitHub
+Actions**.

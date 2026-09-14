@@ -4,80 +4,55 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A personal tech blog: a dependency-free static site (no build step, no npm,
-no bundler) deployed to GitHub Pages. Live at
-https://tzepart.github.io/tech-tzepart/.
+A personal tech blog: Markdown sources in `src/posts/` are rendered to static
+HTML in `dist/` by `build.py` (no static site generator, no Node), then
+deployed to GitHub Pages. Live at https://tzepart.github.io/tech-tzepart/.
 
 ## Commands
 
-There is no build, lint, or test tooling — the entire "toolchain" is a local
-static file server, since the site loads post content via `fetch()` and
-won't work under `file://`:
-
 ```bash
-python3 -m http.server 8000
+pip install -r requirements.txt   # Markdown, Pygments, Jinja2, python-frontmatter
+python build.py                   # wipes and regenerates dist/
+cd dist && python -m http.server 8000
 ```
 
-Then visit `http://localhost:8000`. Deployment is automatic: pushing to
-`main` triggers `.github/workflows/static.yml`, which uploads the repo root
-as-is to GitHub Pages (no build step there either — `path: '.'`).
+There is no test/lint tooling. `dist/` is gitignored and never committed.
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which runs the
+build and uploads `dist/` to Pages.
 
 ## Architecture
 
-### Data-driven posts and homepage
+`build.py` has three phases, kept separate so features (RSS, analytics, etc.)
+can be layered on without touching discovery/rendering:
 
-`posts/posts.json` is the single source of truth for post metadata (slug,
-title, tag, date, dateLabel, readTime, excerpt, format, featured). Nothing
-about individual posts is hardcoded into `index.html` or into per-post pages
-— everything is rendered client-side at page load:
+1. **Discover/load** — every directory under `src/posts/` containing
+   `index.md` is a post; it must be exactly 2 or 3 levels deep
+   (`<category>/<slug>` or `<category>/<sub-category>/<slug>`), and posts
+   can't be nested in other posts. Category/sub-category come from the path,
+   never from frontmatter. Frontmatter: `title` and `date` required, `tags`
+   and `summary` optional. Other `.md` files in the directory are extra pages
+   (optional `title`, `order`). All posts load and validate **before**
+   `dist/` is touched, so a bad post fails the build without deleting output.
+2. **Render** — python-markdown with `fenced_code`, `tables`, `codehilite`
+   (Pygments classes, colored by CSS variables in `style.css`). ```` ```mermaid ````
+   fences are converted to `<pre class="mermaid">` before Markdown runs, and
+   the page is flagged so `base.html` includes the Mermaid script only there.
+   Relative `href`/`src` URLs are rewritten: `foo.md` → `foo/`, and on extra
+   pages (one directory deeper) relative URLs get a `../` prefix.
+3. **Emit** — `dist/` is cleared, `src/static/` copied to `dist/static/`,
+   each post/extra page written as `.../index.html` (clean URLs), each post's
+   `assets/` copied alongside, and `dist/index.html` generated from the
+   category tree.
 
-- `assets/js/home.js` fetches `posts/posts.json`, picks the `featured: true`
-  post (or the newest one) for the hero slot, renders the rest into the post
-  grid, and derives the topic pills from the set of tags in use. It targets
-  `#featuredPost`, `#postGrid`, and `#topicPills` in `index.html`.
-- `assets/js/post.js` runs on every `posts/<slug>/index.html` page. It
-  derives the slug from `location.pathname` (not from any per-file
-  variable), looks up that slug in `../posts.json`, fills in the title/tag/
-  date/read-time placeholders, fetches `hero.html` (optional) and
-  `content.html` or `content.md` (whichever `entry.format` says), builds
-  the Table of Contents from the rendered `<h2>` elements, and activates
-  Mermaid diagrams.
+Output must stay deterministic (sorted traversal, no build timestamps) —
+running the build twice must produce byte-identical `dist/`.
 
-Consequence: **every `posts/<slug>/index.html` file is byte-identical** —
-it's a dumb shell whose only job is to load `post.js`, which does all the
-work based on the URL. Never hand-edit a post's `index.html`; if the shell
-needs to change, change it everywhere (or start from `posts/_template/`).
+## Conventions
 
-### Adding/editing a post
-
-1. Copy `posts/_template/` to `posts/<slug>/`.
-2. Keep exactly one of `content.html` or `content.md` (delete the other),
-   and edit it. Delete `hero.html` if the post has no hero illustration.
-3. Add one entry to `posts/posts.json` with a matching `"format": "html"`
-   or `"format": "md"`.
-
-Both content formats go through the same pipeline: only `<h2>` (HTML) /
-`##` (Markdown) headings become TOC entries; Mermaid diagrams work in both
-(` ```mermaid ` fences in Markdown, `<pre class="mermaid">` in HTML);
-Markdown tables render natively, and HTML posts can use plain `<table>`.
-Markdown is parsed client-side via `marked` and diagrams via `mermaid`,
-both loaded from jsDelivr in the post shell — there is no server-side
-rendering.
-
-### Styling and theme
-
-Everything shares one stylesheet, `assets/css/style.css`. Light/dark theme
-is CSS custom properties on `:root`, overridden both by
-`prefers-color-scheme` and by an explicit `data-theme` attribute set via
-`assets/js/main.js` (the theme toggle button), so dark mode works whether
-the user has an OS preference or has manually toggled it. Hand-drawn SVG
-diagrams (in `content.html` files) use shared CSS classes (`dg-box`,
-`dg-box-accent`, `dg-text`, `dg-line`, etc.) rather than inline colors, so
-they stay theme-aware without extra JS.
-
-### Path conventions
-
-All internal links/assets use **relative paths** (never root-absolute
-`/...`) because GitHub Pages project sites are served from a subpath. Pages
-two levels deep (`posts/<slug>/*`) reference the shared stylesheet and
-scripts as `../../assets/...`.
+- All links in templates are relative via the `root` variable (`./`,
+  `../../../`, …) because GitHub Pages project sites are served from a
+  subpath — never use root-absolute `/...` URLs.
+- No JavaScript except the conditional Mermaid include. Theme is
+  `prefers-color-scheme` only.
+- One stylesheet, system font stack. Inline SVG diagrams use the shared
+  `dg-*` classes so they follow the theme.

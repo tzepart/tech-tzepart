@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ site_name }}{% endblock %}</title>
+{% if description %}
+  <meta name="description" content="{{ description }}">
+{% endif %}
+  <link rel="stylesheet" href="{{ root }}static/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="logo" href="{{ root }}">tech<span>.</span>tzepart</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+{% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a href="https://github.com/tzepart/tech-tzepart">GitHub</a>
+    </div>
+  </footer>
+{% if mermaid %}
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default"
+    });
+    mermaid.run();
+  </script>
+{% endif %}
+</body>
+</html>
