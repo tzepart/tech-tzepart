@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Five stacked browser windows, the newest labelled build.py">
+  <rect width="640" height="360" fill="#f6f7f9"/>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" text-anchor="middle">
+    <rect x="80" y="250" width="340" height="64" rx="10" fill="#ffffff" stroke="#c9cdd4" stroke-width="2"/>
+    <text x="250" y="288" fill="#5b616e">v1 · Jekyll</text>
+    <rect x="120" y="200" width="340" height="64" rx="10" fill="#ffffff" stroke="#c9cdd4" stroke-width="2"/>
+    <text x="290" y="238" fill="#5b616e">v2 · React SPA</text>
+    <rect x="160" y="150" width="340" height="64" rx="10" fill="#ffffff" stroke="#c9cdd4" stroke-width="2"/>
+    <text x="330" y="188" fill="#5b616e">v3 · static site generator</text>
+    <rect x="200" y="100" width="340" height="64" rx="10" fill="#ffffff" stroke="#c9cdd4" stroke-width="2"/>
+    <text x="370" y="138" fill="#5b616e">v4 · plain HTML</text>
+    <rect x="240" y="40" width="340" height="74" rx="10" fill="#eef1fd" stroke="#3457d5" stroke-width="2"/>
+    <circle cx="262" cy="58" r="5" fill="#3457d5"/>
+    <circle cx="278" cy="58" r="5" fill="#3457d5"/>
+    <circle cx="294" cy="58" r="5" fill="#3457d5"/>
+    <text x="410" y="92" fill="#1a1d23" font-size="20" font-weight="700">v5 · build.py</text>
+  </g>
+</svg>

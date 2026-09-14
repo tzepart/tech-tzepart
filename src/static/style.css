@@ -16,10 +16,13 @@
   --code-number: #9a4f00;
   --code-function: #3457d5;
   --code-type: #7a3fb0;
+  color-scheme: light;
 }
 
+/* Dark palette: follows the OS unless the theme toggle stored an explicit choice
+   (data-theme on <html>). Keep both blocks identical. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #14161a;
     --bg-alt: #1c1f25;
     --text: #eceef1;
@@ -34,7 +37,26 @@
     --code-number: #ffa657;
     --code-function: #9db1ff;
     --code-type: #d2a8ff;
+    color-scheme: dark;
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #14161a;
+  --bg-alt: #1c1f25;
+  --text: #eceef1;
+  --text-muted: #9aa1ad;
+  --border: #2a2e36;
+  --accent: #7c93ff;
+  --accent-soft: #232a45;
+
+  --code-keyword: #ff7ab8;
+  --code-string: #7ee787;
+  --code-comment: #8b949e;
+  --code-number: #ffa657;
+  --code-function: #9db1ff;
+  --code-type: #d2a8ff;
+  color-scheme: dark;
 }
 
 * {
@@ -83,7 +105,13 @@ a {
   gap: 16px;
 }
 
-.width-toggle {
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-button {
   color: var(--text-muted);
   background: var(--bg-alt);
   border: 1px solid var(--border);
@@ -93,12 +121,18 @@ a {
   cursor: pointer;
 }
 
-.width-toggle svg {
+.icon-button svg {
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.icon-button:hover,
+.width-toggle[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .width-toggle .icon-narrow,
@@ -110,10 +144,27 @@ a {
   display: block;
 }
 
-.width-toggle:hover,
-.width-toggle[aria-pressed="true"] {
-  color: var(--accent);
-  border-color: var(--accent);
+/* Theme toggle shows the mode you'd switch to: moon in light mode, sun in dark mode. */
+.theme-toggle .icon-sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle .icon-sun {
+  display: block;
+}
+
+:root[data-theme="dark"] .theme-toggle .icon-moon {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle .icon-sun {
+    display: block;
+  }
+
+  :root:not([data-theme="light"]) .theme-toggle .icon-moon {
+    display: none;
+  }
 }
 
 @media (max-width: 760px) {

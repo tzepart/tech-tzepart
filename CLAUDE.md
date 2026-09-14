@@ -60,11 +60,16 @@ running the build twice must produce byte-identical `dist/`.
   `../../../`, …) because GitHub Pages project sites are served from a
   subpath — never use root-absolute `/...` URLs.
 - JavaScript is limited to the conditional Mermaid include, the homepage
-  filters (`static/filter.js`), and the full-width toggle
-  (`static/layout.js` + a one-line inline script in `<head>` that applies
-  the saved `localStorage` choice before first paint). JS-only controls are
-  `hidden` in the markup until their script runs, so no-JS pages stay clean
-  (all cards are simply shown).
-  Theme is `prefers-color-scheme` only.
+  filters (`static/filter.js`), and the header's full-width and day/night
+  toggles (`static/layout.js` + a small inline script in `<head>` that
+  applies the saved `localStorage` choices before first paint). JS-only
+  controls are `hidden` in the markup until their script runs, so no-JS pages
+  stay clean (all cards are simply shown).
+- Theme: follows `prefers-color-scheme` until the toggle stores an explicit
+  choice, which sets `data-theme="dark|light"` on `<html>`. The dark palette
+  in `style.css` therefore exists twice (media query guarded by
+  `:not([data-theme="light"])`, and `[data-theme="dark"]`) — keep both in
+  sync. The toggle dispatches a `themechange` event; the Mermaid script
+  re-renders diagrams from their saved source when it fires.
 - One stylesheet, system font stack. Inline SVG diagrams use the shared
   `dg-*` classes so they follow the theme.
