@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" role="img" aria-label="Four stacked cache layers">
+  <rect width="720" height="240" rx="12" fill="#f6f7f9"/>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" text-anchor="middle">
+    <rect x="40" y="30" width="140" height="180" rx="10" fill="#eef1fd" stroke="#3457d5" stroke-width="2"/>
+    <text x="110" y="115" fill="#1a1d23" font-weight="600">Browser</text>
+    <text x="110" y="138" fill="#5b616e" font-size="12">~2 ms</text>
+
+    <rect x="210" y="50" width="140" height="140" rx="10" fill="#ffffff" stroke="#9aa1ad" stroke-width="2"/>
+    <text x="280" y="115" fill="#1a1d23" font-weight="600">CDN</text>
+    <text x="280" y="138" fill="#5b616e" font-size="12">~6 ms</text>
+
+    <rect x="380" y="70" width="140" height="100" rx="10" fill="#ffffff" stroke="#9aa1ad" stroke-width="2"/>
+    <text x="450" y="115" fill="#1a1d23" font-weight="600">App cache</text>
+    <text x="450" y="138" fill="#5b616e" font-size="12">~38 ms</text>
+
+    <rect x="550" y="90" width="140" height="60" rx="10" fill="#fdeeee" stroke="#d65858" stroke-width="2"/>
+    <text x="620" y="116" fill="#1a1d23" font-weight="600">Database</text>
+    <text x="620" y="136" fill="#5b616e" font-size="12">~180 ms</text>
+
+    <path d="M180 120 H210 M350 120 H380 M520 120 H550" stroke="#5b616e" stroke-width="2"/>
+  </g>
+</svg>
