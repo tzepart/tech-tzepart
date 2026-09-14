@@ -30,14 +30,17 @@ can be layered on without touching discovery/rendering:
    (`<category>/<slug>` or `<category>/<sub-category>/<slug>`), and posts
    can't be nested in other posts. Category/sub-category come from the path,
    never from frontmatter. Frontmatter: `title` and `date` required, `tags`
-   and `summary` optional. Other `.md` files in the directory are extra pages
-   (optional `title`, `order`). All posts load and validate **before**
+   and `summary` optional. Other `.md` and `.ipynb` files in the directory are
+   extra pages (optional `title`, `order` — in frontmatter for `.md`, in
+   top-level notebook `metadata` for `.ipynb`). Notebooks are rendered from
+   saved outputs without executing them or adding dependencies (Pygments for
+   code, python-markdown for markdown cells, images inlined as data URIs). All posts load and validate **before**
    `dist/` is touched, so a bad post fails the build without deleting output.
 2. **Render** — python-markdown with `fenced_code`, `tables`, `codehilite`
    (Pygments classes, colored by CSS variables in `style.css`). ```` ```mermaid ````
    fences are converted to `<pre class="mermaid">` before Markdown runs, and
    the page is flagged so `base.html` includes the Mermaid script only there.
-   Relative `href`/`src` URLs are rewritten: `foo.md` → `foo/`, and on extra
+   Relative `href`/`src` URLs are rewritten: `foo.md`/`foo.ipynb` → `foo/`, and on extra
    pages (one directory deeper) relative URLs get a `../` prefix.
 3. **Emit** — `dist/` is cleared, `src/static/` copied to `dist/static/`,
    each post/extra page written as `.../index.html` (clean URLs), each post's

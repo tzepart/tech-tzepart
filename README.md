@@ -46,6 +46,11 @@ homepage is regenerated from the directory tree on every build.
   page at `<post-url>/<filename>/`, linked from an "In this post" list. Give it
   a `title` in frontmatter (defaults to the filename) and optionally an integer
   `order` (otherwise pages are sorted by filename).
+- **Jupyter notebooks:** a `.ipynb` file in the post directory is rendered as
+  an extra page too (markdown cells, highlighted code, and saved text, HTML,
+  image and error outputs — the notebook is not executed). Set optional
+  `title`/`order` in the notebook's top-level `metadata`. Link to it as
+  `[notebook](analysis.ipynb)`.
 - **Links and images:** use paths relative to the post directory, e.g.
   `![chart](assets/chart.png)` or `[benchmarks](benchmarks.md)` — they work
   from both the main page and extra pages.

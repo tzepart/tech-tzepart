@@ -315,9 +315,47 @@ pre code {
 .highlight .m, .highlight .mb, .highlight .mf, .highlight .mh,
 .highlight .mi, .highlight .il, .highlight .mo { color: var(--code-number); }
 .highlight .nf, .highlight .fm, .highlight .nd, .highlight .na { color: var(--code-function); }
-.highlight .kt, .highlight .nc, .highlight .nn, .highlight .bp { color: var(--code-type); }
+.highlight .kt, .highlight .nc, .highlight .nn, .highlight .bp, .highlight .nb { color: var(--code-type); }
 .highlight .gd { color: var(--code-keyword); }
 .highlight .gi { color: var(--code-string); }
+
+/* Jupyter notebook pages */
+
+.nb-code {
+  margin: 0 0 24px;
+}
+
+.nb-code .highlight pre {
+  margin-bottom: 0;
+  border-left: 3px solid var(--accent);
+}
+
+.nb-output {
+  margin: 0;
+  border: none;
+  border-left: 3px solid var(--border);
+  border-radius: 0;
+  background: none;
+}
+
+.nb-stderr,
+.nb-error {
+  border-left-color: var(--code-keyword);
+}
+
+.nb-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-top: 8px;
+  background: #ffffff;
+  border-radius: 6px;
+}
+
+.nb-html {
+  padding: 8px 16px;
+  overflow-x: auto;
+}
 
 /* Diagrams: Mermaid blocks and hand-drawn SVG figures */
 
