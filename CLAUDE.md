@@ -55,7 +55,10 @@ running the build twice must produce byte-identical `dist/`.
 - All links in templates are relative via the `root` variable (`./`,
   `../../../`, …) because GitHub Pages project sites are served from a
   subpath — never use root-absolute `/...` URLs.
-- No JavaScript except the conditional Mermaid include. Theme is
-  `prefers-color-scheme` only.
+- JavaScript is limited to the conditional Mermaid include and the
+  full-width toggle (`static/layout.js` + a one-line inline script in
+  `<head>` that applies the saved `localStorage` choice before first paint).
+  The toggle button is `hidden` until JS runs, so no-JS pages stay clean.
+  Theme is `prefers-color-scheme` only.
 - One stylesheet, system font stack. Inline SVG diagrams use the shared
   `dg-*` classes so they follow the theme.

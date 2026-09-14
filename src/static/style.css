@@ -60,11 +60,62 @@ a {
   color: var(--accent);
 }
 
+.wide .wrap {
+  max-width: none;
+  padding: 0 clamp(20px, 4vw, 64px);
+}
+
 /* Header / footer */
 
 .site-header {
   border-bottom: 1px solid var(--border);
   padding: 16px 0;
+}
+
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.width-toggle {
+  color: var(--text-muted);
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.width-toggle svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.width-toggle .icon-narrow,
+.wide .width-toggle .icon-wide {
+  display: none;
+}
+
+.wide .width-toggle .icon-narrow {
+  display: block;
+}
+
+.width-toggle:hover,
+.width-toggle[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .width-toggle {
+    display: none;
+  }
 }
 
 .logo {
